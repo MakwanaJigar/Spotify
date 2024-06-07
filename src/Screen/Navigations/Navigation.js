@@ -3,12 +3,15 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createDrawerNavigator } from '@react-navigation/drawer';
 import Login from '../Login/Login';
 import Home from '../Home/Home';
 import Search from '../Search/Search';
 import Library from '../Library/Library';
 import Premium from '../Premium/Premium';
+
+
+import store from '../../Component/redux/store';
+import { Provider } from 'react-redux';
 
 
 // BUTTOM TAB imgS
@@ -20,18 +23,16 @@ import PremiumIMG from '../../Assets/ButtomTabIMG/spotify.png'
 import { Image } from 'react-native';
 import Splash from '../Splash/Splash';
 import SongPlay from '../../Component/PlaySong/SongPlay';
-import DemoMusic from '../../Component/DemoMusic/DemoMusic';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-const Drawer = createDrawerNavigator();
 
 const TabNavigator = () => (
     <Tab.Navigator
         screenOptions={{
             headerShown: false,
             tabBarStyle: {
-                backgroundColor: 'black', // Adjust the last value (0.5) for transparency level
+                backgroundColor: 'black', 
             }
 
         }}
@@ -67,26 +68,22 @@ const TabNavigator = () => (
 
 );
 
-const DrawerNavigator = () => (
-    <Drawer.Navigator>
-        <Drawer.Screen name="Home" component={Home} 
-           />
-        {/* <Drawer.Screen name="Profile" component={Profile} /> */}
-    </Drawer.Navigator>
-);
+
 
 const Navigation = () => {
     return (
+        <Provider store={store}>
+
         <NavigationContainer>
             <Stack.Navigator initialRouteName="Splash" screenOptions={{ headerShown: false }}>
                 <Stack.Screen name="Splash" component={Splash} />
                 <Stack.Screen name="Login" component={Login} />
                 <Stack.Screen name="Main" component={MainNavigator} />
                 <Stack.Screen name="SongPlay" component={SongPlay} />
-                <Stack.Screen name="DemoMusic" component={DemoMusic} />
 
             </Stack.Navigator>
         </NavigationContainer>
+        </Provider>
     );
 }
 

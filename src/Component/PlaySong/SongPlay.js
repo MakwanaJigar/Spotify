@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, Image, TouchableOpacity, ImageBackground, Alert } from 'react-native';
 import Slider from '@react-native-community/slider';
 
 
@@ -11,73 +11,75 @@ import next from '../../Assets/PlaySong/next.png';
 import share from '../../Assets/PlaySong/share.png';
 import down from '../../Assets/PlaySong/down.png';
 import dots from '../../Assets/PlaySong/dots.png';
-import TrackPlayer, { State, usePlaybackState, useProgress } from 'react-native-track-player';
+import TrackPlayer from 'react-native-track-player';
+
+
+import Sound from 'react-native-sound';
+import { useDispatch } from 'react-redux';
+import {addToFavourite} from '../redux/action';
+import { useNavigation } from '@react-navigation/native';
 
 const SongPlay = ({ route }) => {
-  const { url, title, artist, artwork } = route.params;
-  const [playBTN, setPlayBTN] = useState(false);
+  const { url, title, artist, artwork} = route.params;
+  const navigation = useNavigation()
   const [progress, setProgress] = useState(0);
-  
-  const playBackState = usePlaybackState()
-  const Progress = useProgress()
-
-
-  const togglePalyBack =async playBackState => {
-    console.log(playBackState);
-    if(playBackState === State.Paused || playBackState === State.Ready){
-      await TrackPlayer.play()
-    }else{
-      await TrackPlayer.pause()
-    }
-  }
-
-  // const togglePlayNext = playBackState => {
-  //   TrackPlayer.skipToNext();
-  //   playBackState()
-  // }
-
 
   const onSliderValueChange = (value) => {
-    // Update the progress state when the slider value changes
     setProgress(value);
   };
 
-  const handlePlay = async () => {
-    setPlayBTN(!playBTN)
-    await TrackPlayer.skip(1)/
-    await TrackPlayer.play()
-  }
+  const [sound, setSound] = useState(!sound);
+  const [isPlayingSound, setIsPlayingSound] = useState(false);
+
 
   useEffect(() => {
-    setupPlayer()
-  },[])
-
-  const setupPlayer = async () => {
-
-    try {
-
-      await TrackPlayer.setupPlayer()
-
-      await TrackPlayer.updateOptions({
-        // Media controls capabilities
-        capabilities: [
-          Capability.Play,
-          Capability.Pause,
-          Capability.SkipToNext,
-          Capability.SkipToPrevious,
-          Capability.Stop,
-        ],
-
-        // Capabilities that will show up when the notification is in the compact form on Android
-        compactCapabilities: [Capability.Play, Capability.Pause],
-
+    TrackPlayer.setupPlayer().then(async () => {
+      await TrackPlayer.add({
+        id: 'trackId',
+        url: url, 
+        title: title,
+        artist: artist,
       });
-      await TrackPlayer.add("../../Assets/Audio/Titanic.mp3")
-    } catch (error) {
-      console.log("error");
-    }
-  }
+    });
 
+    const newSound = new Sound(url, (error) => {
+      if (error) {
+        console.log('Failed to load the sound', error);
+      }
+    });
+
+    setSound(newSound);
+
+    // Cleanup sound instance on unmount
+    return () => {
+      newSound.release();
+    };
+  }, []);
+
+  const playSound = () => {
+    if (sound) {
+      sound.play((success) => {
+        if (!success) {
+          console.log('Sound playback failed');
+        }
+        setIsPlayingSound(false); // Reset the state after playback ends
+      });
+      setIsPlayingSound(true);
+    }
+  };
+
+  const pauseSound = () => {
+    if (sound) {
+      sound.pause();
+      setIsPlayingSound(false);
+    }
+  };
+
+  const dispatch = useDispatch();  
+  const handleFav = () => {
+    dispatch(addToFavourite)
+    navigation.navigate("Library",{title,artist,artwork,})
+  }
 
   return (
     <ScrollView style={{ height: '100%', width: '100%', backgroundColor: '#1A1C30' }}>
@@ -96,10 +98,13 @@ const SongPlay = ({ route }) => {
         </View>
 
         {/* ....MAIN VIEW...... */}
-        <View>
-          <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-            <Image source={artwork} style={{ width: '80%', height: 400, objectFit: 'contain' }} />
-          </View>
+        <View >
+        <ImageBackground
+        source={artwork}
+        style={{ width: '90%', height: 300, borderRadius: 200, overflow: 'hidden',alignSelf:'center',backgroundColor:'#FFF',alignItems:'center',justifyContent:'center' }}
+        imageStyle={{ borderRadius: 200}}
+      >
+      </ImageBackground>
           <View style={{ marginLeft: 50, marginTop: 50 }}>
             <Text style={{ color: 'white', fontWeight: 'bold' }}>{title}</Text>
             <Text style={{ color: 'white', fontWeight: 'bold' }}>{artist}</Text>
@@ -108,7 +113,7 @@ const SongPlay = ({ route }) => {
           {/* .......SLIDER........ */}
           <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
             <Text style={{ fontSize: 18, marginBottom: 10 }}>
-              Progress: {Math.floor(progress)}%
+              {/* Progress: {Math.floor(progress)}% */}
             </Text>
             <Slider
               style={{ width: '100%' }}
@@ -136,33 +141,40 @@ const SongPlay = ({ route }) => {
               </View>
 
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', columnGap: 20 }}>
-                <TouchableOpacity onPress={async () => {
-                  console.log(playBackState,"Previous");
-                  await TrackPlayer.skipToPrevious()
-                  togglePalyBack(playBackState)
-                }}>
+                <TouchableOpacity>
                   <Image source={previous} style={{ width: 30, height: 30 }} />
                 </TouchableOpacity>
-                <TouchableOpacity style={{ backgroundColor: '#FFF', width: 60, height: 60, alignItems: 'center', justifyContent: 'center', borderRadius: 50 }} 
-                onPress={async() => {
-                  await TrackPlayer.skip(1)
-                  // await TrackPlayer.play()
-                  togglePalyBack(playBackState)
-                }}
-                >
-                  {playBTN ? <Image source={pause} style={{ width: 30, height: 30 }} /> : <Image source={Play} style={{ width: 30, height: 30, marginLeft: 5 }} />}
-                </TouchableOpacity>
-                <TouchableOpacity onPress={async () => {
-                  console.log(playBackState,"Next");
-                  await TrackPlayer.skipToNext()
-                  togglePalyBack(playBackState)
-                }}>
+                {isPlayingSound ? (
+                  <TouchableOpacity
+                    style={{ backgroundColor: '#FFF', width: 60, height: 60, alignItems: 'center', justifyContent: 'center', borderRadius: 50 }}
+                    onPress={pauseSound}
+                  >
+                    <Image source={pause} style={{ width: 30, height: 30 }} />
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={{ backgroundColor: '#FFF', width: 60, height: 60, alignItems: 'center', justifyContent: 'center', borderRadius: 50 }}
+                    onPress={playSound}
+                  >
+                    <Image source={Play} style={{ width: 30, height: 30 }} />
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity>
                   <Image source={next} style={{ width: 30, height: 30 }} />
                 </TouchableOpacity>
               </View>
 
               <View>
-                <TouchableOpacity>
+                <TouchableOpacity 
+                onPress={handleFav}
+                // onPress={() => navigation.navigate("Library",{
+                //   url : url,
+                //   title: title,
+                //   artist : artist,
+                //   artwork : artwork,
+                //   movie:movie
+                // })}
+                >
                   <Image source={share} style={{ width: 30, height: 30 }} />
                 </TouchableOpacity>
               </View>

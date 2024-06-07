@@ -34,13 +34,7 @@ import History from '../../Assets/HomeIMG/Podcast/History.jpg'
 import Horror from '../../Assets/HomeIMG/Podcast/Horror.jpg'
 import Motivation from '../../Assets/HomeIMG/Podcast/Motivation.jpg'
 import Nature from '../../Assets/HomeIMG/Podcast/Nature.jpg'
-import { useNavigation } from '@react-navigation/native';
-
-// import TamashaAudio from '../../Assets/Audio/ParadeDeLaBastilleTamasha.mp3'
-// import DearZindangiAudio from '../../Assets/Audio/AeZindagiGaleLagaLe.mp3'
-// import SinghamAudio from '../../Assets/Audio/Singham.mp3'
-// import TitanicAudio from '../../Assets/Audio/Titanic.mp3'
-// import KhalifaAudio from '../../Assets/Audio/Titanic.mp3' 
+import { useNavigation } from '@react-navigation/native'; 
 
 const Home = () => {
 
@@ -77,7 +71,7 @@ const Home = () => {
             title: "Tamasha",
             artist: "A.R. Rahman",
             movie: "Irshad Kamil",
-            url : '../../Assets/Audio/ParadeDeLaBastilleTamasha.mp3'
+            url: require('../../Assets/Audio/ParadeDeLaBastilleTamasha.mp3')
         },
         {
             id: 2,
@@ -85,7 +79,7 @@ const Home = () => {
             title: "Dear Zindagi",
             artist: "A.R. Rahman",
             movie: "Irshad Kamil",
-            url : '../../Assets/Audio/AeZindagiGaleLagaLe.mp3'
+            url: require('../../Assets/Audio/AeZindagiGaleLagaLe.mp3')
         },
         {
             id: 3,
@@ -93,7 +87,7 @@ const Home = () => {
             title: "Singham",
             artist: "A.R. Rahman",
             movie: "Singham",
-            url : '../../Assets/Audio/Singham.mp3'
+            url: require('../../Assets/Audio/Singham.mp3')
         },
         {
             id: 4,
@@ -101,7 +95,7 @@ const Home = () => {
             title: "Titanic",
             artist: "Unknown",
             movie: "Titanic",
-            url : '../../Assets/Audio/Titanic.mp3'
+            url: require('../../Assets/Audio/Titanic.mp3')
         },
         {
             id: 5,
@@ -109,7 +103,7 @@ const Home = () => {
             title: "See You Again",
             artist: "Unknown",
             movie: "Album",
-            url : '../../Assets/Audio/WizKhalifa.mp3'
+            url: require('../../Assets/Audio/WizKhalifa.mp3')
         },
     ]
 
@@ -339,16 +333,12 @@ const Home = () => {
                     <Text style={{ fontSize: 14, color: '#FFF', fontWeight: 'bold' }}>Podcasts</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={{ width: 90, backgroundColor: '#36454F', height: 30, alignItems: 'center', justifyContent: 'center', borderRadius: 30 }} onPress={() => navigation.navigate("DemoMusic")}>
-                    <Text style={{ fontSize: 14, color: '#FFF', fontWeight: 'bold' }}>DemoMusic</Text>
-                </TouchableOpacity>
-
             </View>
 
             {/*     ALL BTN COMPONENT    */}
             {
                 All ?
-                    <ScrollView style={{ width: '100%', height: '100%', marginTop: 35}}>
+                    <ScrollView style={{ width: '100%', height: '100%', marginTop: 35 }}>
 
 
                         {/* Recommended for you */}
@@ -365,7 +355,8 @@ const Home = () => {
                                                 artwork: item.artwork,
                                                 title: item.title,
                                                 artist: item.artist,
-                                                url : item.url
+                                                url: item.url,
+                                                movie:item.movie 
                                             })}>
                                                 <Image source={item.artwork} style={{ width: 170, height: 170, borderWidth: 0.3, borderColor: 'gray', objectFit: 'cover' }} />
                                             </TouchableOpacity>
@@ -454,8 +445,9 @@ const Home = () => {
                         </View>
 
 
+
                         {/* Recommended for you */}
-                        <View style={{ width: '100%' ,marginTop:50}}>
+                        <View style={{ width: '100%' }}>
 
                             <Text style={{ color: '#FFF', fontWeight: 'bold', fontSize: 24, marginLeft: 10 }}>Recommended for you</Text>
 
@@ -464,12 +456,17 @@ const Home = () => {
                                 {
                                     RecommendedData.map((item) => (
                                         <View style={{ marginLeft: 10, marginTop: 10, rowGap: 10 }} key={item.id}>
-                                            <TouchableOpacity>
-                                                <Image source={item.image} style={{ width: 170, height: 170, borderWidth: 0.3, borderColor: 'gray', objectFit: 'cover' }} />
+                                            <TouchableOpacity onPress={() => navigation.navigate("SongPlay", {
+                                                artwork: item.artwork,
+                                                title: item.title,
+                                                artist: item.artist,
+                                                url: item.url
+                                            })}>
+                                                <Image source={item.artwork} style={{ width: 170, height: 170, borderWidth: 0.3, borderColor: 'gray', objectFit: 'cover' }} />
                                             </TouchableOpacity>
                                             <View style={{ rowGap: 5 }}>
                                                 <Text style={{ color: '#FFF', fontWeight: 'bold' }}>
-                                                    {item.song}
+                                                    {item.title}
                                                 </Text>
                                                 <Text style={{ color: '#D3D3D3' }}>
                                                     {item.artist}
@@ -496,7 +493,7 @@ const Home = () => {
 
 
 
-            {/*     ALMUSICL BTN COMPONENT    */}
+            {/*     ALL MUSIC BTN COMPONENT    */}
             {
                 music ?
                     <ScrollView style={{ width: '100%', height: '100%', marginBottom: '5%' }}>
@@ -632,7 +629,7 @@ const Home = () => {
                                     {pocastData.map((item) => (
                                         <View style={{ marginLeft: 10, marginTop: 10, alignItems: 'center', width: '90%', height: 450, backgroundColor: '#262626', alignItems: 'center', justifyContent: 'center', borderRadius: 20 }} key={item.id}>
                                             <TouchableOpacity style={{ alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }}>
-                                                <Image source={item.image} style={{ width: 250, height: 250, borderWidth: 0.3, borderColor: 'white', objectFit: 'cover' }} />
+                                                <Image source={item.url} style={{ width: 250, height: 250, borderWidth: 0.3, borderColor: 'white', objectFit: 'cover' }} />
                                             </TouchableOpacity>
                                             <View style={{ marginLeft: 15, padding: 10, rowGap: 10 }}>
                                                 <Text style={{ color: '#FFF', fontWeight: 'bold', fontSize: 24 }}>{item.title}</Text>

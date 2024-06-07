@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, Image, KeyboardAvoidingView, KeyboardAvoidingViewComponent, SafeAreaView, Platform, ScrollView } from 'react-native';
 
 import ShowEye from '../../Assets/LoginIMG/view.png'
 import HideEye from '../../Assets/LoginIMG/hide.png'
@@ -25,6 +25,10 @@ const Login = () => {
     }
 
     return (
+
+        <KeyboardAvoidingView enabled behavior={Platform.OS === 'ios' ? 'padding' : null}> 
+
+        <ScrollView style={{width: "100%", height: '100%', backgroundColor: 'black'}}>
 
         <View style={{ width: "100%", height: '100%', backgroundColor: 'black', alignItems: 'center', justifyContent: 'center', rowGap: 20 }}>
 
@@ -99,6 +103,10 @@ const Login = () => {
 
 
         </View>
+
+        </ScrollView>
+
+        </KeyboardAvoidingView>
     );
 }
 
